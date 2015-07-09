@@ -149,6 +149,38 @@ describe( 'complex objects', function() {
 		} );
 	} );
 
+	describe( 'copies deeply', function() {
+		var object = {
+			foo: {
+				bar: false,
+				baz: true
+			},
+			array: [ 1, 2, 3 ]
+		};
+
+		var foo = object.foo;
+		var array = object.array;
+
+		var newObject = conform( {
+			model: model,
+			object: object
+		} );
+
+		foo.bar = null;
+		foo.baz = null;
+
+		it( 'objects', function() {
+			newObject.foo.should.have.property( 'bar', false );
+			newObject.foo.should.have.property( 'baz', true );
+		} );
+
+		array.pop();
+
+		it( 'arrays', function() {
+			newObject.should.have.property( 'array', [ 1, 2, 3 ] );
+		} );
+	} );
+
 	describe( 'converts', function() {
 		var object = {
 			foo: [ 1, 2, 3 ],
@@ -163,13 +195,13 @@ describe( 'complex objects', function() {
 			object: object
 		} );
 
+		it( 'objects', function() {
+			object.should.have.property( 'foo', model.foo );
+		} );
+
 		it( 'arrays', function() {
 			object.foo.should.have.property( 'bar', model.foo.bar );
 			object.foo.should.have.property( 'baz', model.foo.baz );
-		} );
-
-		it( 'objects', function() {
-			object.should.have.property( 'foo', model.foo );
 		} );
 	} );
 } );
