@@ -1,0 +1,25 @@
+{
+  "name": "object-conform",
+  "version": "0.1.0",
+  "description": "Simple object conforming.",
+  "license": "MIT",
+  "author": {
+    "name": "Andy Burke",
+    "email": "aburke@bitflood.org",
+    "url": "https://github.com/andyburke"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hellofloat/object-conform.git"
+  },
+  "scripts": {
+    "test": "mocha --recursive -R spec"
+  },
+  "dependencies": {
+    "es6-shim": "^0.32.2"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.5",
+    "should": "^7.0.1"
+  }
+}
