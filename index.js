@@ -1,14 +1,14 @@
 'use strict';
 
-require( 'es6-shim' );
+const extend = require( 'extend' );
 
 module.exports = conform;
 
 function conform( options ) {
     // ensure object has all fields from model
-    var object = Object.assign( Array.isArray( options.model ) ? [] : {}, options.model, options.object );
+    let object = extend( true, Array.isArray( options.model ) ? [] : {}, options.model, options.object );
 
-    for ( var field in object ) {
+    for ( let field in object ) {
         if ( !object.hasOwnProperty( field ) ) {
             continue;
         }
@@ -18,27 +18,52 @@ function conform( options ) {
             continue;
         }
 
-        // ensure objects are objects
-        if ( options.model[ field ] !== null &&
-             typeof options.model[ field ] === 'object' &&
-             !Array.isArray( options.model[ field ] ) &&
-             ( object[ field ] === null || typeof object[ field ] !== 'object' ) ) {
-            object[ field ] = Object.assign( {}, options.model[ field ] );
-        }
+        ensureObjectsAreObjects( {
+            model: options.model,
+            field: field,
+            object: object
+        } );
 
-        // ensure arrays are arrays
-        if ( Array.isArray( options.model[ field ] ) && !Array.isArray( object[ field ] ) ) {
-            object[ field ] = Object.assign( [], options.model[ field ] );
-        }
+        ensureArraysAreArrays( {
+            model: options.model,
+            field: field,
+            object: object
+        } );
 
-        // ensure nested objects are conformed
-        if ( options.model[ field ] !== null && typeof options.model[ field ] === 'object' ) {
-            object[ field ] = conform( {
-                object: object[ field ],
-                model: options.model[ field ]
-            } );
-        }
+        ensureNestedObjectsAreConformed( {
+            model: options.model,
+            field: field,
+            object: object,
+            nested: options.nested,
+        } );
     }
 
     return object;
+}
+
+function ensureObjectsAreObjects( options ) {
+    if ( options.model[ options.field ] !== null &&
+         typeof options.model[ options.field ] === 'object' &&
+         !Array.isArray( options.model[ options.field ] ) &&
+         ( options.object[ options.field ] === null || typeof options.object[ options.field ] !== 'object' ) ) {
+        options.object[ options.field ] = extend( true, {}, options.model[ options.field ] );
+    }
+}
+
+function ensureArraysAreArrays( options ) {
+    if ( Array.isArray( options.model[ options.field ] ) && !Array.isArray( options.object[ options.field ] ) ) {
+        options.object[ options.field ] = extend( true, [], options.model[ options.field ] );
+    }
+}
+
+function ensureNestedObjectsAreConformed( options ) {
+    if ( options.model[ options.field ] !== null &&
+         typeof options.model[ options.field ] === 'object' &&
+         ( !options.nested || typeof options.nested[ options.field ] === 'undefined' || options.nested[ options.field ] ) ) {
+        options.object[ options.field ] = conform( {
+            object: options.object[ options.field ],
+            model: options.model[ options.field ],
+            nested: options.nested ? options.nested[ options.field ] : null
+        } );
+    }
 }
